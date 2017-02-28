@@ -1,0 +1,148 @@
+<template>
+    <div>
+        <div ref="ele" class="header">
+            <img class="logo" src="../../static/imgs/i_logo.png"/>
+            <h1 :class="{'title-hide':searchActive}">Lo Gic Home</h1>
+            <div class="search" :class="{'search-active':searchActive}">
+                <i class="search-back iconfont icon-right" @click="searchActive=false"></i>
+                <input ref="searchEle" v-model="searchValue" class="search-input" type="text"/>
+                <i class="search-clear iconfont icon-roundclosefill" v-show="searchActive&&searchValue" @click="searchClear"></i>
+                <i class="search-btn iconfont icon-search" @click="handleSearch"></i>
+            </div>
+
+        </div>
+    </div>
+</template>
+<script>
+    import {eventHub} from '../../eventHub';
+    export default {
+        data(){
+            return {
+                scroller:window,
+                searchActive:false,
+                searchValue:""
+            }
+        },
+        methods:{
+//            处理搜索按钮的点击事件
+            handleSearch(){
+                this.$refs.searchEle.focus();
+                if(this.searchActive){
+                    console.log("value:",this.searchValue);
+                } else {
+                    this.searchActive = true
+                }
+            },
+            searchClear(){
+                this.searchValue='';
+                this.$refs.searchEle.focus();
+            },
+            getScrollY() {
+                return (this.scroller.pageYOffset !== undefined)
+                    ? this.scroller.pageYOffset
+                    : (this.scroller.scrollTop !== undefined)
+                        ? this.scroller.scrollTop
+                        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+            },
+            getViewportHeight() {
+                return window.innerHeight
+                    || document.documentElement.clientHeight
+                    || document.body.clientHeight;
+            },
+            getDocumentHeight() {
+                let body = document.body,
+                    documentElement = document.documentElement;
+                return Math.max(
+                    body.scrollHeight, documentElement.scrollHeight,
+                    body.offsetHeight, documentElement.offsetHeight,
+                    body.clientHeight, documentElement.clientHeight
+                );
+            },
+            handleEvent() {
+//                console.log(this.getScrollY());
+            }
+        },
+        mounted(){
+            window.addEventListener('scroll', this.handleEvent, false)
+//            console.log(this.$refs.ele);
+//            console.log(this);
+            eventHub.$on("routerChange",()=>{
+                this.searchActive=false
+            });
+        },
+        beforeRouteLeave(){
+            console.log("hahaha");
+        }
+    }
+</script>
+<style lang="stylus" rel="stylesheet/stylus" scoped>
+    @import "../../static/style/skin.styl"
+    .header
+        position: fixed
+        z-index 99
+        top 0
+        left: 0
+        width: 100%
+        height: 0.4rem
+        background-color: $baseColor
+        .logo
+            position: absolute
+            margin: 0.05rem 0.1rem
+            height: 0.3rem
+            width: 0.3rem
+            display none
+        h1
+            transition text-indent $animateTime
+            color $inverseColor
+            line-height: 0.4rem
+            text-align: center
+            font-size:0.18rem
+            &.title-hide
+                text-indent -5rem
+        .search
+            position: absolute
+            box-sizing border-box
+            transition width $animateTime
+            padding: 0.1rem 0.4rem
+            top: 0
+            right: 0
+            height: 100%
+            width: 0
+            &.search-active
+                width: 100%
+                .search-input
+                    padding: 0 0.1rem
+                .search-back
+                    opacity 1
+            .search-input
+                color $baseColor
+                display block
+                box-sizing border-box
+                font: 0.12rem/0.14rem "microsoft yahei"
+                height: 100%
+                width: 100%
+                border-radius 0.1rem
+                background-color: rgba(255,255,255,0.9)
+            .search-btn
+            .search-back
+            .search-clear
+                color $inverseColor
+                position: absolute
+                font-size: 0.2rem
+                line-height: 0.4rem
+                width: 0.4rem
+                text-align: center
+                top: 0
+                right: 0
+            .search-back
+                transition opacity  $animateTime
+                opacity 0
+                left 0
+            .search-clear
+                color $baseColor
+                font-size: 0.12rem
+                line-height: 0.42rem
+                right: 0.4rem
+                width: 0.3rem
+</style>
+
