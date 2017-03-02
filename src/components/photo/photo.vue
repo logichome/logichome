@@ -1,5 +1,5 @@
 <template>
-    <div class="tmpl">{{msg}}
+    <div class="photo">{{msg}}
         <mt-button type="primary" size="large">primary</mt-button>
         <div class="space"></div>
     </div>

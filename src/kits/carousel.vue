@@ -1,10 +1,10 @@
 <template>
     <div class="carousel">
         <ul ref="ul" class="carousel-img-list">
-            <li v-for="(item,index) in imgList" :key="index"><a href="javascript:void(0);"><img :src="item.url"></a></li>
+            <li v-for="(item,index) in images" :key="index"><a href="javascript:void(0);"><img :src="item.src"></a></li>
         </ul>
         <ul ref="marks" class="carousel-marks">
-            <li v-for="(item,index) in imgList" :key="index" :class="{active:index===0}"></li>
+            <li v-for="(item,index) in images" :key="index" :class="{active:index===0}"></li>
         </ul>
         <!--<span class="carousel-left-arrow">&lt;</span>-->
         <!--<span class="carousel-right-arrow">&gt;</span>-->
@@ -14,36 +14,10 @@
     export default {
         data(){
             return {
-                imgList:[
-                    {
-                        id:1,
-                        url:'src/static/imgs/om_n9.jpg'
-                    },
-                    {
-                        id:2,
-                        url:'src/static/imgs/om_n8.jpg'
-                    },
-                    {
-                        id:3,
-                        url:'src/static/imgs/om_n9.jpg'
-                    },
-                    {
-                        id:4,
-                        url:'src/static/imgs/om_n10.jpg'
-                    },
-                    {
-                        id:5,
-                        url:'src/static/imgs/om_n11.jpg'
-                    },
-                    {
-                        id:6,
-                        url:'src/static/imgs/om_n11.jpg'
-                    },
-                ],
                 options:{
                     canDrag:true,
                     count:1,
-                    time:3000
+                    time:4000
                 },
                 index: 0,
                 boxWidth:0,
@@ -53,11 +27,7 @@
                 marks:null
             }
         },
-        props:{
-            ua:{
-                default:'mobile'
-            }
-        },
+        props:['ua','images'],
         methods:{
             getStyle(ele, attr) {
                 if (ele.currentStyle) {
@@ -85,7 +55,7 @@
                 if (!this.isReady) {
                     return;
                 }
-                if (this.index >= this.imgList.length) {
+                if (this.index >= this.images.length) {
                     this.ul.style.left = 0;
                     this.index = 0;
                 }
@@ -159,7 +129,7 @@
                 })
             },
             changeMark() {
-                var index = this.index === this.imgList.length ? 0 : this.index;
+                var index = this.index === this.images.length ? 0 : this.index;
                 if (this.marks) {
                     for (var i = 0, len = this.marks.length; i < len; i++) {
                         this.marks[i].classList.remove("active");
@@ -208,7 +178,7 @@
                     if (flag) {
                         clearInterval(element.timerId);
                         _this.isReady = true;
-                        if (_this.index > _this.imgList.length) {
+                        if (_this.index > _this.images.length) {
                             _this.ul.style.left = 0;
                         }
                     } else if (_this.isDragging) {
@@ -228,19 +198,19 @@
                     if (!isMobile) e.preventDefault();//阻止默认事件
                     _this.clearIntv();//清除轮播定时器
                     //定义变量
-                    var startX = isMobile ? e.touches[0].pageX : e.pageX;
-                    var moveMouse;
-                    var upMouse;
-                    var distance = 0;
-                    var leader = parseInt(_this.getStyle(this, "left"));
-                    var result = leader;
+                    let startX = isMobile ? e.touches[0].pageX : e.pageX;
+                    let moveMouse;
+                    let upMouse;
+                    let distance = 0;
+                    let leader = parseInt(_this.getStyle(this, "left"));
+                    let result = leader;
                     //绑定鼠标移动与松开事件（鼠标可能移出盒子外，为提高体验绑定了window）
                     window.addEventListener(eventName[1], moveMouse = function (e) {
                         if (!isMobile) e.preventDefault();
                         let positionX = isMobile ? e.touches[0].pageX : e.pageX;
                         distance = positionX - startX;
                         result = leader + distance;
-                        var maxLong = _this.imgList.length * _this.boxWidth;
+                        let maxLong = _this.images.length * _this.boxWidth;
                         if (result > 0) {
                             result -= maxLong;
                         } else if (result < -maxLong) {
@@ -251,8 +221,8 @@
                     window.addEventListener(eventName[2], upMouse = function () {
                         //清除拖拽状态
                         _this.isDragging = false;
-                        var overflow = -result % _this.boxWidth;
-                        var index = parseInt(-result / _this.boxWidth);
+                        let overflow = -result % _this.boxWidth;
+                        let index = parseInt(-result / _this.boxWidth);
                         //判断滑动方向和滑动距离进行动画跳转
                         _this.toJump(distance > 0 ?
                             (overflow > _this.boxWidth * 2 / 3 ? ++index : index) :
@@ -266,11 +236,12 @@
             }
         },
         mounted(){
-            this.init()
+            this.init();
         }
     }
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
+    @import "../static/style/skin.styl"
     .carousel
         position: relative;
         width: 100%;

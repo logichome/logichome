@@ -16,15 +16,21 @@
 <script>
     import {eventHub} from '../../eventHub';
     export default {
+        props:{
+            heightToHide:{
+                default:200
+            }
+        },
         data(){
             return {
                 scroller:window,
+                lastKnownScrollY:0,
                 searchActive:false,
                 searchValue:""
             }
         },
         methods:{
-//            处理搜索按钮的点击事件
+            //处理搜索按钮的点击事件
             handleSearch(){
                 this.$refs.searchEle.focus();
                 if(this.searchActive){
@@ -33,10 +39,12 @@
                     this.searchActive = true
                 }
             },
+            //清除搜索框文字
             searchClear(){
                 this.searchValue='';
                 this.$refs.searchEle.focus();
             },
+            //获取当前滚动位置
             getScrollY() {
                 return (this.scroller.pageYOffset !== undefined)
                     ? this.scroller.pageYOffset
@@ -44,11 +52,13 @@
                         ? this.scroller.scrollTop
                         : (document.documentElement || document.body.parentNode || document.body).scrollTop;
             },
+            //获取可视区域高度
             getViewportHeight() {
                 return window.innerHeight
                     || document.documentElement.clientHeight
                     || document.body.clientHeight;
             },
+            //获取文档高度
             getDocumentHeight() {
                 let body = document.body,
                     documentElement = document.documentElement;
@@ -57,27 +67,28 @@
                     body.offsetHeight, documentElement.offsetHeight,
                     body.clientHeight, documentElement.clientHeight
                 );
-            },
-            handleEvent() {
-//                console.log(this.getScrollY());
             }
         },
         mounted(){
-            window.addEventListener('scroll', this.handleEvent, false)
-//            console.log(this.$refs.ele);
-//            console.log(this);
+            window.addEventListener('scroll', ()=>{
+                let currentScrollY = this.getScrollY();
+                if(this.getScrollY() > this.lastKnownScrollY && this.getScrollY() > this.heightToHide){
+                    this.$refs.ele.style.top = -this.$refs.ele.offsetHeight + 'px'
+                } else {
+                    this.$refs.ele.style.top = '';
+                }
+                this.lastKnownScrollY = currentScrollY
+            }, false);
             eventHub.$on("routerChange",()=>{
                 this.searchActive=false
             });
-        },
-        beforeRouteLeave(){
-            console.log("hahaha");
         }
     }
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     @import "../../static/style/skin.styl"
     .header
+        transition top $animateTime
         position: fixed
         z-index 99
         top 0
