@@ -1,3 +1,4 @@
+// 获取dom样式
 export let getStyle = (ele, attr)=>{
     if (ele.currentStyle) {
         return ele.currentStyle[attr];
@@ -5,6 +6,7 @@ export let getStyle = (ele, attr)=>{
         return getComputedStyle(ele, null)[attr];
     }
 };
+// 动画
 export let animate =  function (element, data, callback) {
     clearInterval(element.timerId);
     return element.timerId = setInterval(function () {

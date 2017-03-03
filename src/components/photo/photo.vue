@@ -1,11 +1,14 @@
 <template>
     <div class="photo">{{msg}}
+        <outer-scroll :canRefresh="false"></outer-scroll>
+
         <mt-button type="primary" size="large">primary</mt-button>
         <div class="space"></div>
     </div>
 </template>
 <script>
     import { Button } from 'mint-ui';
+    import outerScroll from '../../kits/outerScroll.vue';
     export default {
         data(){
             return {
@@ -13,7 +16,8 @@
             }
         },
         components:{
-            "mt-button":Button
+            mtButton:Button,
+            outerScroll
         }
     }
 </script>

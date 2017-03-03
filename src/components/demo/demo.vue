@@ -1,14 +1,20 @@
 <template>
-    <div class="tmpl">{{msg}}
+    <div class="demo">
+        <outer-scroll :canRefresh="false"></outer-scroll>
+        {{msg}}
         <div class="space"></div>
     </div>
 </template>
 <script>
+    import outerScroll from '../../kits/outerScroll.vue';
     export default {
         data(){
             return {
                 msg: 'demo'
             }
+        },
+        components:{
+            outerScroll
         }
     }
 </script>

@@ -11,6 +11,7 @@ import {eventHub} from './eventHub';
 import App from './App.vue';
 import home from './components/home/home.vue';
 import photo from './components/photo/photo.vue';
+import noteDetail from './components/note/noteDetail.vue';
 import note from './components/note/note.vue';
 import about from './components/about/about.vue';
 import demo from './components/demo/demo.vue';
@@ -24,6 +25,7 @@ const router = new VueRouter({
         {name:'root',path:'/',redirect:'/home'},
         {name:'home',path:'/home',component:home},
         {name:'note',path:'/note',component:note},
+        {name:'noteDetail',path:'/note/:id',component:noteDetail},
         {name:'demo',path:'/demo',component:demo},
         {name:'about',path:'/about',component:about},
         {name:'photo',path:'/photo',component:photo}
@@ -54,7 +56,6 @@ const vm = new Vue({
         }
     },
     created(){
-        console.log('vm created');
         this.tellUA();
     }
 });

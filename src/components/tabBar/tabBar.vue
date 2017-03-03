@@ -46,6 +46,7 @@
                     window.scrollTo(0,0);
                 }
                 this.lastClick = li.dataset.compName;
+
             }
         },
         mounted(){

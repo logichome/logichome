@@ -1,11 +1,15 @@
 <template>
     <div>
         <div ref="ele" class="header">
+            <div v-show="showBack" class="back" @click="$router.go(-1)">
+                <i class="iconfont icon-back1"></i>
+                <span>返回</span>
+            </div>
             <img class="logo" src="../../static/imgs/i_logo.png"/>
-            <h1 :class="{'title-hide':searchActive}">Lo Gic Home</h1>
+            <h1 :class="{'title-hide':searchActive}">LOGICHOME.ME</h1>
             <div class="search" :class="{'search-active':searchActive}">
                 <i class="search-back iconfont icon-right" @click="searchActive=false"></i>
-                <input ref="searchEle" v-model="searchValue" class="search-input" type="text"/>
+                <input ref="searchEle" v-model="searchValue" placeholder="站内搜索" class="search-input" type="text"/>
                 <i class="search-clear iconfont icon-roundclosefill" v-show="searchActive&&searchValue" @click="searchClear"></i>
                 <i class="search-btn iconfont icon-search" @click="handleSearch"></i>
             </div>
@@ -26,7 +30,9 @@
                 scroller:window,
                 lastKnownScrollY:0,
                 searchActive:false,
-                searchValue:""
+                searchValue:"",
+                showBack:false,
+                showBackList:['noteDetail']
             }
         },
         methods:{
@@ -79,8 +85,9 @@
                 }
                 this.lastKnownScrollY = currentScrollY
             }, false);
-            eventHub.$on("routerChange",()=>{
-                this.searchActive=false
+            eventHub.$on("routerChange",name=>{
+                this.searchActive=false;
+                this.showBack = this.showBackList.indexOf(name) !== -1
             });
         }
     }
@@ -96,6 +103,15 @@
         width: 100%
         height: 0.4rem
         background-color: $baseColor
+        .back
+            .iconfont
+                position: relative
+                top: 0.01rem
+                left:0.04rem
+            position: absolute
+            left: 0
+            color $inverseColor
+            font 0.16rem/0.4rem $baseFont
         .logo
             position: absolute
             margin: 0.05rem 0.1rem
