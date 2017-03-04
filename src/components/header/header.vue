@@ -1,24 +1,24 @@
 <template>
     <div>
         <div ref="ele" class="header">
-            <div v-show="showBack" class="back" @click="$router.go(-1)">
+            <div :class="{'back-hide':!backButton||searchActive}" class="back" @click="goBack">
                 <i class="iconfont icon-back1"></i>
                 <span>返回</span>
             </div>
             <img class="logo" src="../../static/imgs/i_logo.png"/>
-            <h1 :class="{'title-hide':searchActive}">LOGICHOME.ME</h1>
+            <p class="title" :class="{'title-hide':searchActive}" v-text="headerTitle"></p>
             <div class="search" :class="{'search-active':searchActive}">
-                <i class="search-back iconfont icon-right" @click="searchActive=false"></i>
+                <i class="search-back iconfont icon-right" @click="setSearchActive"></i>
                 <input ref="searchEle" v-model="searchValue" placeholder="站内搜索" class="search-input" type="text"/>
                 <i class="search-clear iconfont icon-roundclosefill" v-show="searchActive&&searchValue" @click="searchClear"></i>
                 <i class="search-btn iconfont icon-search" @click="handleSearch"></i>
             </div>
-
         </div>
     </div>
 </template>
 <script>
     import {eventHub} from '../../eventHub';
+    import { mapState,mapMutations } from 'vuex'
     export default {
         props:{
             heightToHide:{
@@ -29,20 +29,30 @@
             return {
                 scroller:window,
                 lastKnownScrollY:0,
-                searchActive:false,
                 searchValue:"",
-                showBack:false,
                 showBackList:['noteDetail']
             }
         },
+        computed: mapState({
+            headerTitle: 'headerTitle',
+            backButton:'backButton',
+            searchActive:'searchActive'
+        }),
         methods:{
+            ...mapMutations([
+                'setSearchActive'
+            ]),
+            //返回
+            goBack(){
+                this.$router.go(-1);
+            },
             //处理搜索按钮的点击事件
             handleSearch(){
                 this.$refs.searchEle.focus();
                 if(this.searchActive){
                     console.log("value:",this.searchValue);
                 } else {
-                    this.searchActive = true
+                    this.setSearchActive(true);
                 }
             },
             //清除搜索框文字
@@ -58,40 +68,25 @@
                         ? this.scroller.scrollTop
                         : (document.documentElement || document.body.parentNode || document.body).scrollTop;
             },
-            //获取可视区域高度
-            getViewportHeight() {
-                return window.innerHeight
-                    || document.documentElement.clientHeight
-                    || document.body.clientHeight;
-            },
-            //获取文档高度
-            getDocumentHeight() {
-                let body = document.body,
-                    documentElement = document.documentElement;
-                return Math.max(
-                    body.scrollHeight, documentElement.scrollHeight,
-                    body.offsetHeight, documentElement.offsetHeight,
-                    body.clientHeight, documentElement.clientHeight
-                );
+            //头部自动隐藏功能
+            autoHide(){
+                window.addEventListener('scroll', ()=>{
+                    let currentScrollY = this.getScrollY();
+                    if(this.getScrollY() > this.lastKnownScrollY && this.getScrollY() > this.heightToHide){
+                        this.$refs.ele.style.top = -this.$refs.ele.offsetHeight + 'px'
+                    } else {
+                        this.$refs.ele.style.top = '';
+                    }
+                    this.lastKnownScrollY = currentScrollY
+                }, false);
             }
         },
         mounted(){
-            window.addEventListener('scroll', ()=>{
-                let currentScrollY = this.getScrollY();
-                if(this.getScrollY() > this.lastKnownScrollY && this.getScrollY() > this.heightToHide){
-                    this.$refs.ele.style.top = -this.$refs.ele.offsetHeight + 'px'
-                } else {
-                    this.$refs.ele.style.top = '';
-                }
-                this.lastKnownScrollY = currentScrollY
-            }, false);
-            eventHub.$on("routerChange",name=>{
-                this.searchActive=false;
-                this.showBack = this.showBackList.indexOf(name) !== -1
-            });
+            this.autoHide();
         }
     }
 </script>
+
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     @import "../../static/style/skin.styl"
     .header
@@ -108,24 +103,29 @@
                 position: relative
                 top: 0.01rem
                 left:0.04rem
+            transition all $animateTime
             position: absolute
             left: 0
             color $inverseColor
             font 0.16rem/0.4rem $baseFont
+            &.back-hide
+                opacity 0
+                z-index -1
         .logo
             position: absolute
             margin: 0.05rem 0.1rem
             height: 0.3rem
             width: 0.3rem
             display none
-        h1
-            transition text-indent $animateTime
+        .title
+            transition opacity $animateTime
             color $inverseColor
             line-height: 0.4rem
             text-align: center
             font-size:0.18rem
+            opacity 1
             &.title-hide
-                text-indent -5rem
+                opacity 0
         .search
             position: absolute
             box-sizing border-box

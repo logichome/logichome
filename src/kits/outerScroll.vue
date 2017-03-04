@@ -15,8 +15,7 @@
     </div>
 </template>
 <script>
-    import {getStyle,animate} from './common.js';
-    import {eventHub} from '../eventHub';
+    import {getStyle,animate} from '../static/js/common.js';
     export default {
         data(){
             return {
@@ -24,7 +23,7 @@
                 status:'pulling0'
             }
         },
-        props:['canRefresh'],
+        props:['canRefresh','update'],
         methods:{
             /*
             获取滚动条高度
@@ -103,8 +102,6 @@
                             animateTimerId = animate(fatherElement,{top:eleHeight},()=>{
 //                                判断是否支持刷新
                                 if(this.canRefresh){
-//                                    触发更新事件
-                                    eventHub.$emit("update");
                                     this.tips = '正在更新';
                                     this.status = 'loading';
 //                                    处理超时未响应的情况
@@ -115,15 +112,12 @@
                                                 restoreTimerId = setTimeout(function(){
                                                     animateTimerId = animate(fatherElement,{top:0});
                                                 },800);
-                                            eventHub.$off("updateFinish",updateFinishFn);
                                         }
                                     },5000);
-//                                    接收请求完成状态分发事件
-                                    eventHub.$on("updateFinish",updateFinishFn = status=>{
+                                    this.update(status=>{
                                         this.tips = status?'数据已更新':'数据更新失败';
                                         this.status = status?'loaded':'error';
                                         clearTimeout(timeOver);
-                                        eventHub.$off("updateFinish",updateFinishFn);
                                         restoreTimerId = setTimeout(function(){
                                             if(isTouching) return;
                                             animateTimerId = animate(fatherElement,{top:0});

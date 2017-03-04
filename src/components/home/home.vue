@@ -1,15 +1,17 @@
 <template>
     <div class="home">
-        <outer-scroll :canRefresh="true"></outer-scroll>
+        <outer-scroll :canRefresh="true" :update="getCarouselData"></outer-scroll>
         <carousel v-if="carouselImages" :ua="$root.ua" :images="carouselImages"></carousel>
         <div class="welcome">
-            <p class="welcome-title">欢迎来到乌龟包子铺</p>
-            <p class="welcome-content">哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦欢迎语哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦哔哩吧啦欢迎语。</p>
+            <p class="welcome-title">欢迎你来到。</p>
+            <p class="welcome-content">
+                我是包子，这是使用vue全家桶搭建的一个SPA，源码已上传github。欢迎交流，期待你的意见。
+            </p>
         </div>
         <div class="github">
             <a class="github-button" href="https://github.com/logichome">
                 <i class="github-logo"></i>
-                <p class="github-address">github.com/logichome</p>
+                <p class="github-address">ＧＩＴＨＵＢ</p>
             </a>
         </div>
         <div class="last-update">
@@ -111,8 +113,7 @@
                 this.$http.get('http://120.77.202.112/api/getcarousel').then(response => {
                     this.carouselImages = response.body;
                     if(callback) callback(1);
-                }, response => {
-                    console.log('err:',response);
+                }, () => {
                     if(callback) callback(0);
                 });
             },
@@ -125,10 +126,12 @@
                 })
             }
         },
+        activated(){
+            this.$store.commit("initComponent")
+        },
         created() {
             this.getCarouselData();
             this.handleRefresh();
-            console.log("home created");
         },
         components: {
             carousel,
@@ -160,19 +163,19 @@
             padding: 0.2rem
             .github-button
                 display: block
-                border: 0.02rem solid $baseColor
+                border: 0.01rem solid $baseColor
                 background-color: $inverseColor
                 height: 0.5rem
                 line-height: 0.5rem
                 .github-logo
                     position: absolute
-                    margin: 0.1rem 0.5rem
+                    margin: 0.1rem 0.9rem
                     background: url("../../static/imgs/github.png") no-repeat
                     background-size: 100% auto
                     width: 0.3rem
                     height: 0.3rem
                 .github-address
-                    padding-left: 1rem
+                    padding-left: 1.4rem
                     color $baseColor
                     font 0.18rem/0.5rem 'microsoft yahei'
         .last-update

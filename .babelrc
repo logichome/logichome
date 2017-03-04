@@ -2,7 +2,7 @@
   "presets": [
     ["es2015", { "modules": false }]
   ],
-  "plugins": ["transform-runtime",["component", [
+  "plugins": ["transform-runtime","transform-object-rest-spread",["component", [
     {
       "libraryName": "mint-ui",
       "style": true

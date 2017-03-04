@@ -1,29 +1,32 @@
 <template>
     <div class="note">
         <outer-scroll :canRefresh="false"></outer-scroll>
-        <tab :items="tabItems"></tab>
-        <study-note v-if="tabStatus==='note'"></study-note>
+        <tab :items="items"></tab>
+        <note-item :status="tabStatus" :items="items"></note-item>
     </div>
 </template>
 <script>
     import tab from '../../kits/tab.vue';
-    import studyNote from  './studyNote.vue'
+    import noteItem from  './noteItem.vue'
     import outerScroll from '../../kits/outerScroll.vue';
     import {eventHub} from '../../eventHub'
     export default {
         data(){
             return {
-                tabItems:[
+                items:[
                     {
                         name:'笔记',
-                        tag:'note'
+                        tag:'note',
+                        en:"STUDY NOTE"
                     },
                     {
                         name:'书签',
-                        tag:'bookmark'
+                        tag:'bookmark',
+                        en:"BOOKMARK"
                     },{
                         name:'日志',
-                        tag:'log'
+                        tag:'log',
+                        en:"DAILY RECORD"
                     }
                     ],
                 tabStatus:'note'
@@ -31,7 +34,7 @@
         },
         components:{
             tab,
-            studyNote,
+            noteItem,
             outerScroll
         },
         methods:{
@@ -40,6 +43,9 @@
                     this.tabStatus = tag;
                 })
             }
+        },
+        activated(){
+            this.$store.commit("initComponent")
         },
         created(){
             this.changeComponent();

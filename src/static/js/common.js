@@ -6,7 +6,7 @@ export let getStyle = (ele, attr)=>{
         return getComputedStyle(ele, null)[attr];
     }
 };
-// 动画
+// 动画npm
 export let animate =  function (element, data, callback) {
     clearInterval(element.timerId);
     return element.timerId = setInterval(function () {
@@ -44,4 +44,20 @@ export let animate =  function (element, data, callback) {
             if(callback) callback();
         }
     }, 20);
-}
+};
+//获取文档高度
+export let getDocumentHeight = function() {
+    let body = document.body,
+        documentElement = document.documentElement;
+    return Math.max(
+        body.scrollHeight, documentElement.scrollHeight,
+        body.offsetHeight, documentElement.offsetHeight,
+        body.clientHeight, documentElement.clientHeight
+    );
+};
+//获取可视区域高度
+export let getViewportHeight = function() {
+    return window.innerHeight
+        || document.documentElement.clientHeight
+        || document.body.clientHeight;
+};

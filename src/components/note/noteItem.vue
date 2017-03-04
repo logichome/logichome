@@ -1,8 +1,8 @@
 <template>
     <div class="study-note">
         <div class="title">
-            <h3>学习笔记</h3>
-            <p>STUDY NOTE</p>
+            <h3 v-text="items[itemIndex].name"></h3>
+            <p v-text="items[itemIndex].en"></p>
         </div>
         <ul>
             <router-link to="/note/1" tag="li">
@@ -27,7 +27,7 @@
                     <p class="note-info-right fr">
                         <span class="date"><i class="iconfont icon-writefill"></i>2017-3-2</span>
                         <span class="pv"><i class="iconfont icon-attentionfill"></i>22</span>
-                        <span class="star"></i><i class="iconfont icon-appreciatefill"></i>1</span>
+                        <span class="star"><i class="iconfont icon-appreciatefill"></i>1</span>
                     </p>
                 </div>
             </li>
@@ -35,11 +35,20 @@
     </div>
 </template>
 <script>
-
     export default {
+        props:['status','items'],
+        computed:{
+            itemIndex(){
+                let  itemIndex= 0;
+                this.items.forEach((value,index)=>{
+                    itemIndex = this.status === value.tag ? index : itemIndex;
+                });
+                return itemIndex
+            }
+        },
         data(){
             return {}
-        }
+        },
     }
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
