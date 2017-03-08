@@ -1,21 +1,21 @@
 ## 目录
-──src
-    ├─components
-    │  ├─about
-    │  ├─demo
-    │  ├─header
-    │  ├─home
-    │  ├─note
-    │  ├─photo
-    │  └─tabBar
-    ├─kits
-    ├─router
-    ├─static
-    │  ├─font
-    │  ├─imgs
-    │  ├─js
-    │  └─style
-    └─store
+    ──src   
+        ├─components
+        │  ├─about
+        │  ├─demo
+        │  ├─header
+        │  ├─home
+        │  ├─note
+        │  ├─photo
+        │  └─tabBar
+        ├─kits
+        ├─router
+        ├─static
+        │  ├─font
+        │  ├─imgs
+        │  ├─js
+        │  └─style
+        └─store
 
 ## 命令
 - `npm i` 安装依赖
