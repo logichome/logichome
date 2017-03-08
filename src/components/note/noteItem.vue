@@ -5,38 +5,38 @@
             <p v-text="items[itemIndex].en"></p>
         </div>
         <ul>
-            <router-link to="/note/1" tag="li">
-                <p class="note-title">学习笔记标题</p>
+            <router-link v-for="(noteItem,index) in noteList" :key="index" :to="'/note/'+noteItem.noteid" tag="li">
+                <p class="noteItem.title" v-text="noteItem.title"></p>
                 <div class="note-info clearfix">
                     <p class="note-info-left fl">
-                        <span class="author"><i class="iconfont icon-peoplefill">Rico</i></span>
+                        <span class="author"><i class="iconfont icon-peoplefill" v-text="noteItem.author"></i></span>
                     </p>
                     <p class="note-info-right fr">
-                        <span class="date"><i class="iconfont icon-writefill"></i>2017-3-2</span>
-                        <span class="pv"><i class="iconfont icon-attentionfill"></i>22</span>
-                        <span class="star"></i><i class="iconfont icon-appreciatefill"></i>1</span>
+                        <span class="date"><i class="iconfont icon-writefill" v-text="noteItem.date"></i></span>
+                        <span class="pv"><i class="iconfont icon-attentionfill" v-text="noteItem.views"></i></span>
+                        <span class="star"></i><i class="iconfont icon-appreciatefill" v-text="noteItem.likes"></i></span>
                     </p>
                 </div>
             </router-link>
-            <li>
-                <p class="note-title">学习笔记标题</p>
-                <div class="note-info clearfix">
-                    <p class="note-info-left fl">
-                        <span class="author"><i class="iconfont icon-peoplefill">Rico</span>
-                    </p>
-                    <p class="note-info-right fr">
-                        <span class="date"><i class="iconfont icon-writefill"></i>2017-3-2</span>
-                        <span class="pv"><i class="iconfont icon-attentionfill"></i>22</span>
-                        <span class="star"><i class="iconfont icon-appreciatefill"></i>1</span>
-                    </p>
-                </div>
-            </li>
+            <!--<li>-->
+                <!--<p class="note-title">学习笔记标题</p>-->
+                <!--<div class="note-info clearfix">-->
+                    <!--<p class="note-info-left fl">-->
+                        <!--<span class="author"><i class="iconfont icon-peoplefill">Rico</span>-->
+                    <!--</p>-->
+                    <!--<p class="note-info-right fr">-->
+                        <!--<span class="date"><i class="iconfont icon-writefill"></i>2017-3-2</span>-->
+                        <!--<span class="pv"><i class="iconfont icon-attentionfill"></i>22</span>-->
+                        <!--<span class="star"><i class="iconfont icon-appreciatefill"></i>1</span>-->
+                    <!--</p>-->
+                <!--</div>-->
+            <!--</li>-->
         </ul>
     </div>
 </template>
 <script>
     export default {
-        props:['status','items'],
+        props:['status','items','noteList'],
         computed:{
             itemIndex(){
                 let  itemIndex= 0;

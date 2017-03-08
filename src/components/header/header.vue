@@ -6,7 +6,7 @@
                 <span>返回</span>
             </div>
             <img class="logo" src="../../static/imgs/i_logo.png"/>
-            <p class="title" :class="{'title-hide':searchActive}" v-text="headerTitle"></p>
+            <p class="title" :class="{'title-hide':searchActive}" v-text="headerTitle" @click="scrollToTop"></p>
             <div class="search" :class="{'search-active':searchActive}">
                 <i class="search-back iconfont icon-right" @click="setSearchActive"></i>
                 <input ref="searchEle" v-model="searchValue" placeholder="站内搜索" class="search-input" type="text"/>
@@ -17,7 +17,6 @@
     </div>
 </template>
 <script>
-    import {eventHub} from '../../eventHub';
     import { mapState,mapMutations } from 'vuex'
     export default {
         props:{
@@ -30,7 +29,7 @@
                 scroller:window,
                 lastKnownScrollY:0,
                 searchValue:"",
-                showBackList:['noteDetail']
+                showBackList:['noteDetail'],
             }
         },
         computed: mapState({
@@ -44,7 +43,13 @@
             ]),
             //返回
             goBack(){
-                this.$router.go(-1);
+                this.$route.name === "err404"?
+                    this.$router.go(-2) :
+                    this.$router.go(-1);
+            },
+            //返回顶部
+            scrollToTop(){
+                window.scrollTo(0,0);
             },
             //处理搜索按钮的点击事件
             handleSearch(){
@@ -59,30 +64,7 @@
             searchClear(){
                 this.searchValue='';
                 this.$refs.searchEle.focus();
-            },
-            //获取当前滚动位置
-            getScrollY() {
-                return (this.scroller.pageYOffset !== undefined)
-                    ? this.scroller.pageYOffset
-                    : (this.scroller.scrollTop !== undefined)
-                        ? this.scroller.scrollTop
-                        : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-            },
-            //头部自动隐藏功能
-            autoHide(){
-                window.addEventListener('scroll', ()=>{
-                    let currentScrollY = this.getScrollY();
-                    if(this.getScrollY() > this.lastKnownScrollY && this.getScrollY() > this.heightToHide){
-                        this.$refs.ele.style.top = -this.$refs.ele.offsetHeight + 'px'
-                    } else {
-                        this.$refs.ele.style.top = '';
-                    }
-                    this.lastKnownScrollY = currentScrollY
-                }, false);
             }
-        },
-        mounted(){
-            this.autoHide();
         }
     }
 </script>
@@ -90,7 +72,6 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     @import "../../static/style/skin.styl"
     .header
-        transition top $animateTime
         position: fixed
         z-index 99
         top 0

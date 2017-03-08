@@ -1,12 +1,9 @@
 <template>
     <div class="home">
-        <outer-scroll :canRefresh="true" :update="getCarouselData"></outer-scroll>
-        <carousel v-if="carouselImages" :ua="$root.ua" :images="carouselImages"></carousel>
+        <banner v-if="carouselImages" :imgList="carouselImages"></banner>
         <div class="welcome">
-            <p class="welcome-title">欢迎你来到。</p>
-            <p class="welcome-content">
-                我是包子，这是使用vue全家桶搭建的一个SPA，源码已上传github。欢迎交流，期待你的意见。
-            </p>
+            <p class="welcome-title">欢迎你的到来</p>
+            <p class="welcome-content"></p>
         </div>
         <div class="github">
             <a class="github-button" href="https://github.com/logichome">
@@ -20,36 +17,10 @@
                 <p>LAST UPDATE</p>
             </div>
             <ul>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="update-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">照片</span>
-                        <span class="update-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">照片</span>
-                        <span class="update-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="update-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="update-content">我是标题我来试试水</span>
-                    </a>
-                </li>
+                <router-link v-for="(item,index) in lastUpdateList" :key="index" :to="item.url" tag="li">
+                        <span class="content-type" v-text="transType(item.type)"></span>
+                        <span class="update-content" v-text="item.title"></span>
+                </router-link>
             </ul>
         </div>
         <div class="random-list">
@@ -58,90 +29,100 @@
                 <p>HELP YOURSELF</p>
             </div>
             <div class="get-others">
-                <a href="javascript:void(0)">
+                <a href="javascript:void(0)" @click="getHelpYourself()">
                     <i class="iconfont icon-forward"></i>
                     <span>换一批</span>
                 </a>
             </div>
             <ul>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="random-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">照片</span>
-                        <span class="random-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">照片</span>
-                        <span class="random-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="random-content">我是标题我来试试水</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="@">
-                        <span class="content-type">笔记</span>
-                        <span class="random-content">我是标题我来试试水</span>
-                    </a>
-                </li>
+                <router-link v-for="(item,index) in helpYourselfList" :key="index" :to="item.url" tag="li">
+                    <span class="content-type" v-text="transType(item.type)"></span>
+                    <span class="random-content" v-text="item.title"></span>
+                </router-link>
             </ul>
         </div>
     </div>
 </template>
 <script>
-    import carousel from '../../kits/carousel.vue';
+
     import outerScroll from '../../kits/outerScroll.vue';
-    import {eventHub} from '../../eventHub';
+    import banner from './banner.vue';
     export default {
         data(){
             return {
-                carouselImages:null
+                carouselImages:null,
+                helpYourselfList:[],
+                lastUpdateList:[]
             }
         },
         methods:{
+            //轮播图请求
             getCarouselData(callback){
-                this.$http.get('http://120.77.202.112/api/getcarousel').then(response => {
-                    this.carouselImages = response.body;
+                this.$http.get('http://120.77.202.112/api/getcarousel').then(res => {
+                    this.carouselImages = res.body;
                     if(callback) callback(1);
                 }, () => {
                     if(callback) callback(0);
                 });
             },
-            handleRefresh(){
-                eventHub.$on('update',()=>{
-                    this.carouselImages = false;
-                    this.getCarouselData(status=>{
-                        eventHub.$emit('updateFinish',status);
-                    })
+            //随便瞅瞅请求
+            getHelpYourself(callback){
+                this.$http.get('http://120.77.202.112/api/gethelpyourself').then(res => {
+                    this.helpYourselfList = res.body;
+                    if(callback) callback(1);
+                },() => {
+                    if(callback) callback(0);
                 })
+            },
+            //最近更新请求
+            getLastUpdate(callback){
+                this.$http.get('http://120.77.202.112/api/getlastupdate').then(res => {
+                    this.lastUpdateList = res.body;
+                    if(callback) callback(1);
+                }, () => {
+                    if(callback) callback(0);
+                });
+            },
+            getDate(callback){
+                //定义闭包函数存储请求状态，满足3个成功请求返回状态码1，否则返回0
+                let store = !callback ?  //无回调则不定义闭包函数
+                    null :
+                    (()=>{
+                    let flag = 0,
+                        count =0;
+                    return status => {
+                        flag+=status;
+                        count++;
+                        if(count === 3) callback(flag === 3 ? 1 : 0);
+                    }
+                })();
+                //调用请求函数
+                this.getCarouselData(store);
+                this.getHelpYourself(store);
+                this.getLastUpdate(store);
+            },
+            transType(type){
+                switch (type){
+                    case "note":
+                        return "笔记";
+                        break;
+                    case "bookmark":
+                        return "书签";
+                        break;
+                    case "image":
+                        return "照片";
+                }
             }
         },
         activated(){
             this.$store.commit("initComponent")
         },
         created() {
-            this.getCarouselData();
-            this.handleRefresh();
+            this.getDate();
         },
         components: {
-            carousel,
+            banner,
             outerScroll
-        },
-        beforeDestroy(){
-            console.log("home beforeDestroy");
-        },
-        destroyed(){
-            console.log("home Destroy");
         }
     }
 </script>

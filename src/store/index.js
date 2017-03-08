@@ -1,6 +1,8 @@
 import Vuex from 'vuex';
 import Vue from 'vue';
 Vue.use(Vuex);
+
+import noteStore from "./noteStore";
 const state = {
     ua:"mobile",
     headerTitle:"LOGICHOME.ME",
@@ -20,16 +22,23 @@ const mutations = {
         state.backButton = options.backButton || false;
         state.searchActive = options.searchActive || false;
         state.headerTitle = options.headerTitle || 'LOGICHOME.ME';
+    },
+    setUA(state,val){
+        state.ua = val;
     }
 };
 const actions = {
 
 };
+const modules = {
+    noteStore
+};
 const store = new Vuex.Store({
     // strict: true,
     state,
     mutations,
-    actions
+    actions,
+    modules
 });
 
 export default store;

@@ -2,23 +2,17 @@
     <div class="comment">
         <h4>评论</h4>
         <ul class="comment-list">
-            <li>
+            <li v-for="(item,index) in commentList" :key="index">
                 <div class="user-info clearfix">
                     <div class="user-avatar fl">
                         <i class="iconfont icon-peoplefill"></i>
                     </div>
-                    <p class="user-name fl">游客123</p>
+                    <p class="user-name fl" v-text="item.visitor"></p>
                 </div>
-                <div class="message">嘻嘻哒</div>
+                <div class="message" v-text="item.content">嘻嘻哒</div>
             </li>
-            <li>
-                <div class="user-info clearfix">
-                    <div class="user-avatar fl">
-                        <i class="iconfont icon-peoplefill"></i>
-                    </div>
-                    <p class="user-name fl">游客123</p>
-                </div>
-                <div class="message">嘻嘻哒</div>
+            <li class="no-comment" v-if="!commentList">
+                <p>沙发都没人坐，不来个葛优躺么</p>
             </li>
         </ul>
         <h4>发表评论</h4>
@@ -26,13 +20,12 @@
         <input v-model="visitorName" type="text" class="visitor-name" />
         <textarea class="comment-content" v-model="commentContent"></textarea>
         <button @click="commentSubmit" class="comment-submit">提交</button>
-        <toast :message="message" :show="timeToShowMessage"></toast>
     </div>
 </template>
 <script>
-    import toast from  "./toast.vue"
+    import {Toast,Indicator} from 'mint-ui'
     export default {
-        props:['id','commentList'],
+        props:['commentList','addComment'],
         data(){
             return {
                 visitorName:"",
@@ -43,29 +36,44 @@
         },
         methods:{
             commentSubmit(){
-                console.log(1);
                 if(!this.commentContent){
-                    this.showMessage('内容不能为空')
+                    Toast({
+                        message: '内容不能为空',
+                        position: 'middle',
+                        duration: 2000
+                    });
                 }else if(!this.visitorName) {
-                    this.showMessage('昵称不能为空')
+                    Toast({
+                        message: '昵称不能为空',
+                        position: 'middle',
+                        duration: 2000
+                    });
                 }else{
-                    console.log({
-                        visitor:this.visitorName,
-                        content:this.commentContent
+                    Indicator.open({
+                        text: '发送中...',
+                        spinnerType: 'fading-circle'
+                    });
+                    this.addComment(this.visitorName,this.commentContent,(status) => {
+                        if(status){
+                            Indicator.close();
+                            Toast({
+                                message: '提交成功',
+                                position: 'middle',
+                                duration: 2000
+                            });
+                            this.visitorName = "";
+                            this.commentContent = "";
+                        } else {
+                            Indicator.close();
+                            Toast({
+                                message: '评论失败',
+                                position: 'middle',
+                                duration: 2000
+                            });
+                        }
                     });
                 }
-            },
-            showMessage(msg){
-                clearTimeout(this.timerId);
-                this.message = msg;
-                this.timeToShowMessage= true;
-                this.timerId = setTimeout(()=>{
-                    this.timeToShowMessage= false;
-                },2000)
             }
-        },
-        components:{
-            toast
         }
     }
 </script>
@@ -100,6 +108,9 @@
                     height: 0.3rem
                     text-indent:2em
                     font:0.16rem/0.3rem $baseFont
+                &.no-comment
+                    text-align: center
+                    background-color: inherit
         .visitor-name-tips
             font 0.16rem/0.3rem $baseFont
             padding-left: 0.1rem

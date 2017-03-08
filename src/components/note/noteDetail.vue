@@ -1,33 +1,66 @@
 <template>
     <div class="note-detail">
-        <outer-scroll></outer-scroll>
+        <outer-scroll :canRefresh="true" :update="getContent"></outer-scroll>
         <div class="note-content" v-html="content"></div>
-        <like id="1" count="1"></like>
-        <comment id="1"></comment>
+        <like :id="noteId" :count="likeCount" :addLike="addCount"></like>
+        <comment :commentList="commentList" :addComment="addComment"></comment>
     </div>
 </template>
 <script>
     import HyperDown from 'hyperdown'
     import HighLight from 'highlight.js'
-    import '../../static/style/atelier-dune-light.css'
     import comment from '../../kits/comment.vue'
     import outerScroll from '../../kits/outerScroll.vue'
     import like from '../../kits/like.vue'
+    import "../../static/style/atelier-dune-light.css"
     export default {
         data(){
             return {
-                content:''
+                content:'',
+                likeCount:0,
+                noteId:"",
+                commentList:[]
+            }
+        },
+        methods:{
+            addComment(name,content,callback){
+                this.$http.post("http://120.77.202.112/api/addnotecomment/"+this.noteId,{
+                    visitor:name,
+                    content,
+                    date:new Date().getTime()
+                },{emulateJSON:true}).then(()=>{
+                    this.getContent(callback);
+                },()=>{
+                    if(callback) callback(0);
+                })
+            },
+            addCount(){
+                this.$http.get("http://120.77.202.112/api/addnotelike/"+this.noteId)
+                    .then((res)=>{
+                        if(res) this.likeCount++
+                    });
+            },
+            getContent(callback){
+                let parser = new HyperDown;
+                this.$http.get('http://120.77.202.112/api/getnotedetail/'+this.$route.params.id)
+                    .then(res=>{
+                        this.content = parser.makeHtml(res.body.text);
+                        this.likeCount = res.body.likes;
+                        this.noteId = res.body.noteid;
+                        this.commentList = res.body.comment;
+                        this.$store.commit('initComponent',{
+                            headerTitle:res.body.title,
+                            backButton:true
+                        })
+                        if(callback) callback(1);
+                    },()=>{
+                        if(callback) callback(0);
+                        this.$router.push({path:'/err404'})
+                    })
             }
         },
         activated(){
-            let parser = new HyperDown;
-            this.$http.get('http://127.0.0.1/api/getnotedetail/1').then((res)=>{
-                this.content = parser.makeHtml(res.body.text);
-                this.$store.commit('initComponent',{
-                    headerTitle:res.body.title,
-                    backButton:true
-                })
-            })
+            this.getContent();
         },
         updated(){
             let codes = document.getElementsByTagName("code");

@@ -1,14 +1,16 @@
 <template>
     <div class="photo">
-        <outer-scroll :canRefresh="false"></outer-scroll>
         <div class="photo-content">
             <div class="title">
                 <h2>照片</h2>
                 <p class="title-en">PHOTO</p>
             </div>
             <div class="photo-list">
-                <ul>
-                    <router-link v-for="(item,value) in photoList" :to="'/photo/'+item.dirid" tag="li">
+                <ul
+                        v-infinite-scroll="loadMore"
+                        infinite-scroll-disabled="loading"
+                        infinite-scroll-distance="0">
+                    <router-link v-for="(item,value) in showList" :to="'/photo/'+item.dirid" tag="li">
                         <div class="photo-img">
                             <img :src="item.cover"/>
                         </div>
@@ -28,29 +30,57 @@
                         </div>
                     </router-link>
                 </ul>
+                <p class="loading" v-if="loading && !loaded">玩命加载中...</p>
+                <p class="loaded" v-if="loaded">已经到底啦~</p>
             </div>
         </div>
 
-        <div class="space"></div>
     </div>
 </template>
 <script>
     import outerScroll from '../../kits/outerScroll.vue';
+    import { InfiniteScroll } from 'mint-ui';
+    import  Vue from 'vue'
+    Vue.use(InfiniteScroll);
     export default {
         data(){
             return {
-                photoList:[]
+                photoList:[],
+                showList:[],
+                loaded:false,
+                loading:false
             }
         },
         methods:{
-            getPhotoList(){
-                this.$http.get("http://127.0.0.1/api/getphotodir").then(res=>{
+            getPhotoList(callback){
+                this.$http.get("http://120.77.202.112/api/getphotodir").then(res=>{
                     this.photoList = res.body;
-                    console.log(this.photoList);
-                })
+                    this.showList = this.photoList.slice(0,2);
+                    if(callback) callback(1);
+                }, () => {
+                    if(callback) callback(0);
+                });
+            },
+            loadMore() {
+                this.loading = true;
+                setTimeout(() => {
+                    let last = this.showList.length - 1;
+                    for (let i = 1; i <= 2; i++) {
+                        if(this.photoList.length === this.showList.length){
+                            this.loading = true;
+                            this.loaded = true;
+                            return
+                        }
+                        this.showList.push(this.photoList[last+i]);
+                    }
+                    this.loading = false;
+                }, 1000);
             }
         },
         activated(){
+            this.loading = false;
+            this.loaded = false;
+            this.$store.commit("initComponent");
             this.getPhotoList();
         },
         components:{
@@ -90,4 +120,8 @@
                             padding: 0 0.1rem
                             margin-bottom: 0.1rem
                             font 0.16rem/0.3rem $baseFont
+            .loading
+            .loaded
+                text-align: center
+                color $baseColor
 </style>

@@ -32,7 +32,6 @@
     </div>
 </template>
 <script>
-    import {eventHub} from '../../eventHub';
     export default {
         data(){
             return {
@@ -60,6 +59,7 @@
         background-color: $inverseColor
         border-top: 0.01rem dashed $baseColor
         position: fixed
+        z-index 10
         height: 0.6rem
         width: 100%
         left: 0

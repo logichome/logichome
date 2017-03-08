@@ -1,19 +1,18 @@
 <template>
     <div class="note">
-        <outer-scroll :canRefresh="false"></outer-scroll>
-        <tab :items="items"></tab>
-        <note-item :status="tabStatus" :items="items"></note-item>
+        <tab :items="tabItems" :active="activeTab" :setActive="setNoteType"></tab>
+        <note-item :status="activeTab" :items="tabItems" :noteList="noteList"></note-item>
     </div>
 </template>
 <script>
     import tab from '../../kits/tab.vue';
     import noteItem from  './noteItem.vue'
     import outerScroll from '../../kits/outerScroll.vue';
-    import {eventHub} from '../../eventHub'
+    import { mapState,mapMutations } from 'vuex'
     export default {
         data(){
             return {
-                items:[
+                tabItems:[
                     {
                         name:'笔记',
                         tag:'note',
@@ -23,13 +22,9 @@
                         name:'书签',
                         tag:'bookmark',
                         en:"BOOKMARK"
-                    },{
-                        name:'日志',
-                        tag:'log',
-                        en:"DAILY RECORD"
                     }
-                    ],
-                tabStatus:'note'
+                ],
+                noteList:[]
             }
         },
         components:{
@@ -37,22 +32,39 @@
             noteItem,
             outerScroll
         },
+        computed:{
+            ...mapState({
+                activeTab:state=>state.noteStore.activeTab
+            })
+        },
         methods:{
-            changeComponent(){
-                eventHub.$on('tabChange',tag=>{
-                    this.tabStatus = tag;
-                })
+            ...mapMutations([
+                'setNoteActiveTab'
+            ]),
+            getNoteList(callback){
+                this.$http.get("http://120.77.202.112/api/getnotelist/"+this.activeTab).then(res=>{
+                    this.noteList = res.body;
+                    if(callback) callback(1);
+                }, () => {
+                    if(callback) callback(0);
+                });
+            },
+            setNoteType(type){
+                this.setNoteActiveTab(type);
+                this.getNoteList();
             }
         },
         activated(){
-            this.$store.commit("initComponent")
+            this.$store.commit("initComponent");
+            this.getNoteList();
         },
         created(){
-            this.changeComponent();
+            this.setNoteActiveTab(this.tabItems[0].tag);
         }
     }
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
     @import "../../static/style/skin.styl"
-
+    .note
+        min-height 6rem
 </style>

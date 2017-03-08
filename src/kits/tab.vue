@@ -1,21 +1,19 @@
 <template>
     <div class="tab">
-        <div v-for="(item,index) in items" :key="index" v-text="item.name" class="tab-item" @click="tabChange(item.tag)" :class="{'active-item':item.tag===status}"></div>
+        <div v-for="(item,index) in items" :key="index" v-text="item.name" class="tab-item" @click="tabChange(item.tag)" :class="{'active-item':item.tag===active}"></div>
     </div>
 </template>
 <script>
-    import {eventHub} from '../eventHub'
     export default {
-        props:['items'],
+        props:['items','active','setActive'],
         data(){
             return {
-                status:this.items[0].tag
+
             }
         },
         methods:{
             tabChange(tag){
-                eventHub.$emit('tabChange',tag);
-                this.status = tag;
+                this.setActive(tag);
             }
         }
     }

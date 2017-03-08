@@ -61,3 +61,11 @@ export let getViewportHeight = function() {
         || document.documentElement.clientHeight
         || document.body.clientHeight;
 };
+//获取当前滚动位置
+export let getScrollY = function(){
+    return (this.scroller.pageYOffset !== undefined)
+        ? this.scroller.pageYOffset
+        : (this.scroller.scrollTop !== undefined)
+            ? this.scroller.scrollTop
+            : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+}
